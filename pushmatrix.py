@@ -19,7 +19,6 @@ from nio import (
     ErrorResponse,
     JoinedMembersError,
     JoinError,
-    ProfileGetAvatarError,
     ProfileSetAvatarError,
     RoomCreateError,
     RoomCreateError,
@@ -354,7 +353,6 @@ async def setAvatar(client: AsyncClient, path: pathlib.Path):
         res, _ = await client.upload(
             f,
             content_type=f"image/{path.suffix[1:]}",
-            # filename=path.name,
             filesize=fileStat.st_size,
         )
 
