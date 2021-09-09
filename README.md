@@ -34,7 +34,7 @@ or with docker compse
 version: "3.7"
 services:
   pushmatrix:
-    name: pushmatrix
+    container_name: pushmatrix
     image: bonukai/pushmatrix
       ports:
         - 8571:8571
