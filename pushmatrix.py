@@ -168,7 +168,7 @@ clientConfig = AsyncClientConfig(
     encryption_enabled=True,
 )
 
-client = AsyncClient(
+mainClient = AsyncClient(
     homeserver=HOMESERVER,
     user=USER_ID,
     store_path=STORE_DIR,
@@ -182,7 +182,7 @@ clients: dict[str, AsyncClient] = {}
 
 
 async def inviteUserToRoom(newClient: AsyncClient):
-    res = await client.room_invite(
+    res = await mainClient.room_invite(
         room_id=roomId,
         user_id=newClient.user_id
     )
@@ -252,7 +252,7 @@ async def handleMessage(request: Request):
         print(f"[{title}]: {message}")
 
     else:
-        res = await client.room_send(
+        res = await mainClient.room_send(
             room_id=roomId,
             content={
                 "msgtype": f"m.{MESSAGE_TYPE}",
@@ -277,7 +277,7 @@ app.add_routes([
 
 
 async def createRoom():
-    res = await client.room_create(
+    res = await mainClient.room_create(
         visibility=RoomVisibility.private,
         name=ROOM_NAME,
         invite=RECEIPIENTS,
@@ -298,7 +298,7 @@ async def createRoom():
                         "redact": 0,
                         "users_default": 0,
                         "users": {
-                            client.user_id: 100
+                            mainClient.user_id: 100
                         },
                         "events": {
                             "m.room.message": 50,
@@ -314,14 +314,14 @@ async def createRoom():
     if isinstance(res, RoomCreateError):
         raise Exception(res)
 
-    await client.sync(full_state=True)
+    await mainClient.sync(full_state=True)
 
     return res.room_id
 
 
 def findRoomId():
     room = next(
-        (x for x in list(client.rooms.values()) if x.name == ROOM_NAME),
+        (x for x in list(mainClient.rooms.values()) if x.name == ROOM_NAME),
         None
     )
 
@@ -446,7 +446,7 @@ async def init():
 
     print(f"Login in with: {USER_ID} on server: {HOMESERVER}")
 
-    res = await client.login(
+    res = await mainClient.login(
         password=PASSWORD,
         device_name=DEVICE_NAME
     )
@@ -455,7 +455,7 @@ async def init():
         print(f"Failed. {res}")
         print("Trying to register")
 
-        res = await client.register(
+        res = await mainClient.register(
             username=USER_ID,
             password=PASSWORD,
             device_name=DEVICE_NAME
@@ -464,17 +464,17 @@ async def init():
         if isinstance(res, ErrorResponse):
             raise Exception(res)
 
-    if client.should_upload_keys:
-        await client.keys_upload()
+    if mainClient.should_upload_keys:
+        await mainClient.keys_upload()
 
-    if client.should_query_keys:
-        await client.keys_query()
+    if mainClient.should_query_keys:
+        await mainClient.keys_query()
 
-    if client.should_claim_keys:
-        await client.keys_claim()
+    if mainClient.should_claim_keys:
+        await mainClient.keys_claim()
 
-    await client.sync(full_state=True)
-    await client.set_displayname(DISPLAYNAME)
+    await mainClient.sync(full_state=True)
+    await mainClient.set_displayname(DISPLAYNAME)
 
     roomId = findRoomId()
 
@@ -482,7 +482,7 @@ async def init():
         roomId = await createRoom()
 
     else:
-        members = await client.joined_members(roomId)
+        members = await mainClient.joined_members(roomId)
 
         if isinstance(members, JoinedMembersError):
             raise Exception(members)
@@ -491,23 +491,23 @@ async def init():
 
         for receipient in RECEIPIENTS:
             if receipient not in membersId:
-                res = await client.room_invite(roomId, receipient)
+                res = await mainClient.room_invite(roomId, receipient)
                 if isinstance(res, RoomInviteError):
                     raise Exception(res)
 
-    if client.should_upload_keys:
-        await client.keys_upload()
+    if mainClient.should_upload_keys:
+        await mainClient.keys_upload()
 
-    if client.should_query_keys:
-        await client.keys_query()
+    if mainClient.should_query_keys:
+        await mainClient.keys_query()
 
-    if client.should_claim_keys:
-        await client.keys_claim()
+    if mainClient.should_claim_keys:
+        await mainClient.keys_claim()
 
     avatarPath = findAvatar(DISPLAYNAME)
 
     if avatarPath:
-        await setAvatar(client, avatarPath)
+        await setAvatar(mainClient, avatarPath)
 
 
 def closeClients(client: AsyncClient):
@@ -538,4 +538,4 @@ if __name__ == "__main__":
         print("Received keyboard interrupt.")
     finally:
         print("Exiting")
-        closeClients(client)
+        closeClients(mainClient)
