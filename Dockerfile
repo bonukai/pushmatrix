@@ -17,6 +17,7 @@ COPY --from=builder /root/.local /root/.local
 ENV PATH=/root/.local:$PATH
 
 COPY pushmatrix.py ./
+COPY index.html ./
 
 ENV STORE_DIR "/store"
 ENV AVATARS_DIR "/avatars"

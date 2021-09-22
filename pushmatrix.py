@@ -28,6 +28,15 @@ from nio import (
 )
 from nio.responses import LoginError, ProfileGetAvatarResponse
 
+from jinja2 import Environment, FileSystemLoader, select_autoescape
+
+env = Environment(
+    loader=FileSystemLoader("."),
+    autoescape=select_autoescape()
+)
+
+template = env.get_template("index.html")
+
 
 def exisiting_dir(path):
     if os.path.isdir(path) and os.path.exists(path):
@@ -240,7 +249,6 @@ async def handleMessage(request: Request):
             content={
                 "msgtype": f"m.{MESSAGE_TYPE}",
                 "body": message,
-
             },
             message_type="m.room.message",
             ignore_unverified_devices=True
@@ -272,8 +280,17 @@ async def handleMessage(request: Request):
     return web.Response(body="Ok")
 
 
+async def getMain(request: Request):
+    body = template.render(token=(APP_TOKEN != None))
+
+    return web.Response(
+        body=body,
+        content_type="text/html"
+    )
+
 app.add_routes([
-    web.post("/message", handleMessage)
+    web.get("/", getMain),
+    web.post("/message", handleMessage),
 ])
 
 
@@ -522,6 +539,14 @@ def closeClients(client: AsyncClient):
 
 def main():
     asyncio.get_event_loop().run_until_complete(init())
+
+    asyncio.get_event_loop().create_task(
+        mainClient.sync_forever(
+            timeout=3000,
+            full_state=True,
+        )
+    )
+
     web.run_app(app, port=PORT)
 
 

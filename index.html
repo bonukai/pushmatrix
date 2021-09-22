@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Pushmatrix</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+
+<body>
+    <div class="container">
+        <form id="form">
+            <h1>Pushmatrix</h1>
+            {% if token %}
+            <input id="tokenInput" type="password" placeholder="token" required>
+            {% endif %}
+            <input id="titleInput" type="text" placeholder="title" autofocus required>
+            <textarea id="messageInput" placeholder="message" required></textarea>
+            <button id="sendButton">Send</button>
+        </form>
+    </div>
+    <div class="msg error" id="msgErrorDiv"></div>
+    <div class="msg success" id="msgSuccessDiv"></div>
+    </div>
+
+    <script>
+        const onSubmit = async (e) => {
+            e.preventDefault();
+
+            msgSuccessDiv.innerText = "";
+            msgErrorDiv.innerText = "";
+
+            sendButton.disabled = true;
+
+            const message = messageInput.value;
+            const title = titleInput.value;
+            const token = window.tokenInput?.value;
+
+            const res = await fetch('/message', {
+                method: 'POST',
+                headers: {
+                    contentType: "application/json"
+                },
+                body: JSON.stringify({
+                    message: message,
+                    title: title,                    
+                    token: token,
+                })
+            })
+
+            if (res.status !== 200) {
+                const text = await res.text();
+                msgErrorDiv.innerText = text || res.statusText;
+            }
+
+            else {
+                msgSuccessDiv.innerText = "Message send";
+                messageInput.value = "";
+                titleInput.value = "";
+                titleInput.focus();
+            }
+
+            sendButton.disabled = false;
+        }
+
+        form.onsubmit = onSubmit;
+    </script>
+
+    <style>
+        .msg {
+            margin-top: 10px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .error {
+            color: red;
+        }
+
+        .success {
+            color: green;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            max-width: 500px;
+            width: 100%;
+            align-items: center;
+        }
+
+        textarea,
+        input,
+        button,
+        div {
+            font-size: 18px;
+        }
+
+        textarea,
+        input {
+            width: 100%;
+            margin: 0;
+            border: 1px solid gray;
+            border-radius: 2px;
+            transition: 200ms;
+        }
+
+        textarea:focus,
+        input:focus {
+            outline: none;
+            border-color: blue;
+            box-shadow: 0 0 2px 0.5px blue;
+        }
+
+        textarea {
+            resize: none;
+            margin: 10px 0;
+            height: 200px;
+        }
+
+        button {
+            align-self: flex-end;
+        }
+
+        #tokenInput {
+            margin-bottom: 10px;
+        }
+    </style>
+</body>
+</html>

@@ -103,3 +103,7 @@ Access to the API can be limited by providing APP_TOKEN environment variable
 ```
 Ok
 ```
+
+## Web interface
+There is avalible simple web interface for sending messages
+![screenshot](/screenshots/web_interface.jpg)
