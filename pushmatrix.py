@@ -257,7 +257,8 @@ async def handleMessage(request: Request):
             content={
                 "msgtype": f"m.{MESSAGE_TYPE}",
                 "body": f"{title}: {message}",
-
+                "format": "org.matrix.custom.html",
+                "formatted_body": f"<strong>{title}:</strong> {message}",
             },
             message_type="m.room.message",
             ignore_unverified_devices=True
