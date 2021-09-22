@@ -211,7 +211,7 @@ async def handleMessage(request: Request):
         "required": ["message", "title"]
     }
 
-    if APP_TOKEN:            
+    if APP_TOKEN:
         schema["properties"]["token"] = {"type": "string"}
         schema["required"].append("token")
 
@@ -358,10 +358,6 @@ async def setAvatar(client: AsyncClient, path: pathlib.Path):
         )
 
         if isinstance(res, UploadResponse):
-            print(res.content_uri)
-            print(res.content_uri)
-            print(res.content_uri)
-            print(res.content_uri)
             res = await client.set_avatar(res.content_uri)
 
             if isinstance(res, ProfileSetAvatarError):
