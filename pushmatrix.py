@@ -227,7 +227,7 @@ async def handleMessage(request: Request):
     token = data.get("token")
 
     if APP_TOKEN and token != APP_TOKEN:
-        return web.Response(status=401)
+        return web.Response(status=401, body="Invalid token")
 
     if NEW_USER_FOR_TITLE:
         newClient = await getClient(title)
