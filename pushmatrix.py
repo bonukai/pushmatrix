@@ -434,6 +434,11 @@ async def getClient(title: str):
 
         await newClient.set_displayname(title)
 
+    res_displayname = await newClient.get_displayname()
+    if res_displayname.displayname.startswith(USER_PREFIX):
+        print(f"Setting displayname for user {userId}")
+        await newClient.set_displayname(title)
+
     if newClient.should_upload_keys:
         await newClient.keys_upload()
 

@@ -66,6 +66,21 @@ docker run -d \
 	bonukai/pushmatrix
 ```
 
+If your server doesn't support registration of new users, but you have access to the command line, you can still use this feature. Calculate the internal user name for the topics you plan to use. In this example for the topic `doorbell`:
+
+```
+echo -n "doorbell" | base64 
+ZG9vcmJlbGw=
+```
+
+The internal username for `doorbell` will be `pushmatrix_ZG9vcmJlbGw=`. You can create this user with the same password that you use for the general pushmatrix user. For Synapse the command looks like this:
+
+```
+register_new_matrix_user -u pushmatrix_ZG9vcmJlbGw= -p password -c /data/homeserver.yaml https://matrix.example.org
+```
+
+When you use the topic for the first time, pushmatrix will set a more user-friendly displayname for that user - and also an avatar image if you put an appropriately named image into the `avatar/` folder.
+
 ### Authentication
 
 Access to the API can be limited by providing APP_TOKEN environment variable
